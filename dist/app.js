@@ -584,11 +584,57 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"igcvL":[function(require,module,exports) {
+// app.js
+// Import du fichier slider.js
+var _sliderJs = require("./slider.js");
 "use strict";
 window.Webflow ||= [];
 window.Webflow.push(()=>{
     alert("hello world");
+    // Appeler la fonction initializeSlider depuis slider.js
+    (0, _sliderJs.initializeSlider)();
 });
+
+},{"./slider.js":"807TH"}],"807TH":[function(require,module,exports) {
+// slider.js
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "initializeSlider", ()=>initializeSlider);
+"use strict";
+function initializeSlider() {
+    // Ici, ajoutez votre logique pour le slider
+    alert("hello slider");
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, "__esModule", {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
 
 },{}]},["hPIHA","igcvL"], "igcvL", "parcelRequire5b01")
 
