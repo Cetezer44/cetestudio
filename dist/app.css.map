@@ -1,1 +1,1 @@
-{"mappings":"AACA","sources":["styles-cete.css"],"sourcesContent":["/* styles-cete.css */\n.spline-section {\n    background-color: black!important;\n}"],"names":[],"version":3,"file":"app.css.map","sourceRoot":"/__parcel_source_root/"}
+{"mappings":"AACA","sources":["css/stylecete.css"],"sourcesContent":["/* stylecete.css */\n.spline-section {\n    background-color: #79d715;\n}"],"names":[],"version":3,"file":"app.css.map","sourceRoot":"/__parcel_source_root/"}

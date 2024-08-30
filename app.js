@@ -1,6 +1,9 @@
 // app.js
 "use strict";
 
+// Import du fichier CSS
+import './css/stylecete.css';
+
 // Import du fichier slider.js
 import { initializeSlider } from './slider.js';
 
