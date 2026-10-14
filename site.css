@@ -1,0 +1,133 @@
+/* Cete Studio 2026 — CSS en complément du Designer Webflow
+   Ici : uniquement ce que le Designer ne sait pas faire (états posés par le JS, éléments créés par le JS,
+   sélecteurs parent/enfant, variables calculées). Tout le reste est dans les classes Webflow.
+   Police : Be Vietnam Pro 300/400, hébergée dans Webflow (Site settings > Fonts). */
+
+/* Body : le style « Body (All Pages) » n'est pas modifiable par l'API Webflow (à déplacer dans le Designer si souhaité) */
+body{background-color:#f0f0f0;color:#000;font-family:'Be Vietnam Pro',Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a:focus-visible{outline:1px solid currentColor;outline-offset:4px}
+
+/* ---------- Accueil ---------- */
+html[data-page="home"], html[data-page="home"] body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+.is-intro .hero-title { opacity: 0; }
+/* Cache plein écran le temps que le loader se mette en place (disparaît seul après 8 s si le script échoue) */
+html.is-loading body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f0f0f0; z-index: 9998; animation: ldSafe 0s linear 8s forwards; }
+@keyframes ldSafe { to { visibility: hidden; } }
+/* Zoom léger dans l'image au survol d'un projet (survol du parent : impossible dans le Designer) */
+.wheel-card:hover .wheel-img, .wheel-card:focus-visible .wheel-img { transform: scale(1.07); }
+html.is-leaving .wheel-card .wheel-img { transform: scale(1.001); }
+@media (prefers-reduced-motion: reduce) { .wheel-img { transition: none; } .wheel-card:hover .wheel-img { transform: none; } }
+
+/* ---------- Page projet ---------- */
+/* Lien de la rubrique en cours (WORKS sur une page projet) : barré */
+.nav-link[aria-current="page"] { text-decoration: line-through; text-decoration-thickness: 1px; }
+.work-media { width: calc(100% - var(--side, 68px)); clip-path: inset(0 0 50% 0); }   /* --side : largeur de la barre latérale, mesurée par le JS */
+.work-heading > span { display: block; }   /* span du masque, créé par le JS */
+.is-wintro .work-tags, .is-wintro .work-text { visibility: hidden; }
+.is-wintro .work-heading { opacity: 0; }
+.is-wintro .work-media { clip-path: inset(0 0 0% 0); }
+
+/* ---------- Modal contact ---------- */
+:root { --glass: 74px; }
+.cm-glass { position: fixed; top: 0; left: 0; bottom: 0; z-index: 49; width: var(--glass); background: rgba(255,255,255,.1); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); opacity: 0; visibility: hidden; transition: opacity 500ms ease, visibility 0s linear 500ms; }
+/* Le verre n'apparaît qu'une fois le fond noir arrivé (extension : 1000 ms dans site.js) */
+html.is-menu .cm-glass { opacity: 1; visibility: visible; transition: opacity 600ms ease 1000ms, visibility 0s; }
+.cm-mark { position: absolute; left: 30px; top: 31px; width: 14px; opacity: 0; transition: opacity 400ms ease; }
+.cm-mark img { display: block; width: 100%; height: auto; }
+html.is-menu .cm-mark { opacity: 1; transition-delay: 1250ms; }
+/* Logo de la navigation : masqué sous la bande en verre pendant que la modal est ouverte */
+html.is-menu .home-logo { opacity: 0; transition-duration: 300ms; }
+.cm-bg { position: fixed; top: 0; right: 0; z-index: 49; width: var(--side, 68px); height: 100vh; background: #000; pointer-events: none; }
+html.is-menu .cm-bg { pointer-events: auto; }
+.cm { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 51; visibility: hidden; pointer-events: none; color: #fff; }
+.cm a, .cm button { pointer-events: auto; color: #fff; text-decoration: none; }
+.cm-cols { position: absolute; left: calc(var(--glass) + 30px); top: 30px; display: flex; column-gap: 10.4vw; }
+.cm-col { display: flex; flex-direction: column; align-items: flex-start; row-gap: 20px; }
+.cm-head { margin: 0; font-size: 11px; line-height: .85; font-weight: 300; letter-spacing: -.05em; text-decoration: underline; }
+.cm-link { font-size: 13px; line-height: .85; font-weight: 300; letter-spacing: -.05em; text-transform: uppercase; }
+.cm a:hover, .cm button:hover { text-decoration: line-through; }
+.cm-main { position: absolute; left: calc(var(--glass) + 30px); top: 50%; transform: translateY(-50%); display: flex; align-items: center; column-gap: 61px; }
+.cm-title { margin: 0; font-size: clamp(30px, 3.472vw, 50px); line-height: 1; font-weight: 400; letter-spacing: -.05em; white-space: nowrap; }
+.cm-coords { display: flex; flex-direction: column; align-items: flex-start; row-gap: 16px; }
+.cm-coord { font-size: clamp(16px, 1.389vw, 20px); line-height: .85; font-weight: 300; letter-spacing: -.05em; }
+.cm-close { position: absolute; right: 54px; top: 50%; transform: translateY(-50%); padding: 0; border: 0; background: none; font: inherit; font-size: 13px; line-height: .85; font-weight: 300; letter-spacing: -.05em; text-transform: uppercase; }
+.cm-logo { position: absolute; left: calc(var(--glass) + 30px); bottom: 30px; width: 37.78vw; height: 11.74vw; }
+.cm-logo img { position: absolute; left: 50%; top: 50%; width: 11.74vw; height: 37.78vw; max-width: none; transform: translate(-50%, -50%) rotate(90deg); }
+html.is-menu, html.is-menu body { overflow: hidden; }
+html.is-menu .side-contact { text-decoration: line-through; }
+html.is-menu .burger-line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+html.is-menu .burger-line:nth-child(2) { transform: scaleX(0); }
+html.is-menu .burger-line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+@media (max-width: 767px) {
+  :root { --glass: 24px; }
+  .cm-mark { display: none; }
+  .cm-cols { right: calc(var(--side, 68px) + 20px); flex-wrap: wrap; column-gap: 40px; row-gap: 30px; }
+  .cm-main { right: calc(var(--side, 68px) + 20px); flex-direction: column; align-items: flex-start; row-gap: 24px; }
+  .cm-title { white-space: normal; }
+  .cm-close { top: auto; bottom: 30px; right: calc(var(--side, 68px) + 20px); transform: none; }
+}
+
+/* ---------- Curseur ---------- */
+@media (hover: hover) and (pointer: fine) {
+  html.has-cursor, html.has-cursor * { cursor: none !important; }
+  /* Showreel : l'icône et le texte ne s'affichent que dans le curseur */
+  html.has-cursor .showreel-play, html.has-cursor .showreel-label { opacity: 0; }
+}
+.c-cursor { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; mix-blend-mode: difference; opacity: 0; transition: opacity 300ms ease; }
+.c-cursor.is-visible { opacity: 1; }
+.c-cursor__ring, .c-cursor__dot, .c-cursor__label { position: fixed; top: 0; left: 0; will-change: transform; }
+.c-cursor__ring, .c-cursor__dot { border-radius: 50%; transition-property: opacity; transition-duration: 300ms; }
+.c-cursor__ring {
+  width: 14px; height: 14px; margin: -7px 0 0 -7px;
+  border: 1px solid #fff; box-sizing: border-box;
+  transition: width 500ms cubic-bezier(.16,1,.3,1), height 500ms cubic-bezier(.16,1,.3,1), margin 500ms cubic-bezier(.16,1,.3,1), opacity 300ms ease;
+}
+.c-cursor.is-hover .c-cursor__ring { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
+.c-cursor__dot { width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; background: #fff; }
+/* Mode vidéo : le cercle laisse place à « ▶ Lire le showreel » */
+.c-cursor__label { display: flex; align-items: center; gap: 8px; white-space: nowrap; color: #fff;
+  font-family: 'Be Vietnam Pro', Arial, sans-serif; font-size: 10px; line-height: 1.3; text-transform: uppercase; }
+.c-cursor__label-in { display: flex; align-items: center; gap: 8px; transform: translate(-50%, -50%) scale(.6); opacity: 0;
+  transition: transform 500ms cubic-bezier(.16,1,.3,1), opacity 300ms ease; }
+.c-cursor__label img { width: 9px; height: auto; display: block; }
+.c-cursor.is-video .c-cursor__ring, .c-cursor.is-video .c-cursor__dot { opacity: 0; }
+.c-cursor.is-video .c-cursor__label-in { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+/* Mode lecteur (vidéo du showreel) : le cercle devient l'icône pause, ou lecture si la vidéo est en pause */
+.c-cursor__media { position: fixed; top: 0; left: 0; will-change: transform; }
+.c-cursor__icon { display: block; width: 60px; height: 60px; margin: -30px 0 0 -30px; overflow: visible; opacity: 0; transform: scale(.5);
+  transition: transform 500ms cubic-bezier(.16,1,.3,1), opacity 300ms ease; }
+.c-cursor__icon g { transition: opacity 200ms ease; }
+.c-cursor__play { opacity: 0; }
+.c-cursor.is-paused .c-cursor__play { opacity: 1; }
+.c-cursor.is-paused .c-cursor__pause { opacity: 0; }
+.c-cursor.is-media .c-cursor__icon { opacity: 1; transform: none; }
+.c-cursor.is-media .c-cursor__ring, .c-cursor.is-media .c-cursor__dot { opacity: 0; }
+
+/* ---------- Modal showreel ---------- */
+.sr { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 60; visibility: hidden; color: #fff; }
+.sr-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; clip-path: inset(100% 0 0 0); }
+.sr-mark { position: absolute; z-index: 2; left: 30px; top: 31px; width: 14px; opacity: 0; mix-blend-mode: difference; pointer-events: none; }
+.sr-mark img { display: block; width: 100%; height: auto; filter: invert(1); }
+.sr-nav { position: absolute; z-index: 2; left: 50%; top: 38px; transform: translateX(-50%); display: flex; column-gap: 30px; mix-blend-mode: difference; }
+.sr-link { font-size: 13px; line-height: .85; font-weight: 300; letter-spacing: -.05em; text-transform: uppercase; color: #fff; text-decoration: none; }
+.sr-link:hover { text-decoration: line-through; text-decoration-thickness: 1px; }
+/* Vidéo pleine largeur depuis le haut ; seule la bande du bas (91 px) reste noire pour la croix.
+   Logo et navigation passent par-dessus en mode Différence. La vidéo est en cover (le 16/9 n'est pas conservé). */
+.sr-zone { position: absolute; top: 0; left: 0; right: 0; bottom: 91px; }
+.sr-frame { position: relative; width: 100%; height: 100%; opacity: 0; }
+.sr-video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 5px; background: #000; cursor: pointer; }
+.sr-bar { position: absolute; left: 0; right: 0; top: calc(100% + 39px); display: flex; justify-content: center; }
+.sr-video:focus { outline: none; }
+.sr-video:focus-visible { outline: 1px solid #fff; outline-offset: 4px; }
+/* Écrans tactiles (pas de curseur) : icône lecture au centre quand la vidéo est en pause */
+.sr-state { position: absolute; left: 50%; top: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; pointer-events: none; opacity: 0; transition: opacity 300ms ease; }
+.sr-state svg { display: block; width: 100%; height: 100%; }
+html:not(.has-cursor) .sr-frame.is-paused .sr-state { opacity: 1; }
+.sr-close { position: relative; width: 13px; height: 13px; padding: 0; border: 0; background: none; cursor: pointer; }
+.sr-close span { position: absolute; left: 50%; top: 50%; width: 17px; height: 1px; background: #f0f0f0; transform: translate(-50%, -50%) rotate(45deg) scaleX(0); transition: transform 500ms cubic-bezier(.65,0,.35,1); }
+.sr-close span + span { transform: translate(-50%, -50%) rotate(-45deg) scaleX(0); }
+.sr-close.is-in span { transform: translate(-50%, -50%) rotate(45deg) scaleX(1); transition-duration: 900ms; transition-timing-function: cubic-bezier(.16,1,.3,1); }
+.sr-close.is-in span + span { transform: translate(-50%, -50%) rotate(-45deg) scaleX(1); transition-delay: 80ms; }
+.sr-close:hover span { background: #fff; }
+.sr button:focus-visible, .sr a:focus-visible { outline: 1px solid #fff; outline-offset: 4px; }
+html.is-reel, html.is-reel body { overflow: hidden; }
