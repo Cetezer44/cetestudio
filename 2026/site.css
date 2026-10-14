@@ -35,10 +35,11 @@ html.is-leaving .wheel-card .wheel-img { transform: scale(1.001); }
 /* ---------- Modal contact ---------- */
 :root { --glass: 74px; }
 .cm-glass { position: fixed; top: 0; left: 0; bottom: 0; z-index: 49; width: var(--glass); background: rgba(255,255,255,.1); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); opacity: 0; visibility: hidden; transition: opacity 500ms ease, visibility 0s linear 500ms; }
-html.is-menu .cm-glass { opacity: 1; visibility: visible; transition: opacity 700ms ease 450ms, visibility 0s; }
+/* Le verre n'apparaît qu'une fois le fond noir arrivé (extension : 1000 ms dans site.js) */
+html.is-menu .cm-glass { opacity: 1; visibility: visible; transition: opacity 600ms ease 1000ms, visibility 0s; }
 .cm-mark { position: absolute; left: 30px; top: 31px; width: 14px; opacity: 0; transition: opacity 400ms ease; }
 .cm-mark img { display: block; width: 100%; height: auto; }
-html.is-menu .cm-mark { opacity: 1; transition-delay: 600ms; }
+html.is-menu .cm-mark { opacity: 1; transition-delay: 1250ms; }
 .cm-bg { position: fixed; top: 0; right: 0; z-index: 49; width: var(--side, 68px); height: 100vh; background: #000; pointer-events: none; }
 html.is-menu .cm-bg { pointer-events: auto; }
 .cm { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 51; visibility: hidden; pointer-events: none; color: #fff; }
