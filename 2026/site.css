@@ -106,14 +106,15 @@ html.is-menu .burger-line:nth-child(3) { transform: translateY(-6px) rotate(-45d
 /* ---------- Modal showreel ---------- */
 .sr { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 60; visibility: hidden; color: #fff; }
 .sr-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; clip-path: inset(100% 0 0 0); }
-.sr-mark { position: absolute; left: 30px; top: 31px; width: 14px; opacity: 0; }
+.sr-mark { position: absolute; z-index: 2; left: 30px; top: 31px; width: 14px; opacity: 0; mix-blend-mode: difference; pointer-events: none; }
 .sr-mark img { display: block; width: 100%; height: auto; filter: invert(1); }
-.sr-nav { position: absolute; left: 50%; top: 38px; transform: translateX(-50%); display: flex; column-gap: 30px; }
+.sr-nav { position: absolute; z-index: 2; left: 50%; top: 38px; transform: translateX(-50%); display: flex; column-gap: 30px; mix-blend-mode: difference; }
 .sr-link { font-size: 13px; line-height: .85; font-weight: 300; letter-spacing: -.05em; text-transform: uppercase; color: #fff; text-decoration: none; }
 .sr-link:hover { text-decoration: line-through; text-decoration-thickness: 1px; }
-/* Zone de la vidéo : 80 px en haut, 91 px en bas, ~80 px sur les côtés ; le cadre garde le 16/9 */
-.sr-zone { position: absolute; top: 80px; bottom: 91px; left: 80px; right: 80px; display: flex; align-items: center; justify-content: center; }
-.sr-frame { position: relative; width: min(100%, calc((100vh - 171px) * 16 / 9)); aspect-ratio: 16 / 9; opacity: 0; }
+/* Vidéo pleine largeur depuis le haut ; seule la bande du bas (91 px) reste noire pour la croix.
+   Logo et navigation passent par-dessus en mode Différence. La vidéo est en cover (le 16/9 n'est pas conservé). */
+.sr-zone { position: absolute; top: 0; left: 0; right: 0; bottom: 91px; }
+.sr-frame { position: relative; width: 100%; height: 100%; opacity: 0; }
 .sr-video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 5px; background: #000; cursor: pointer; }
 .sr-bar { position: absolute; left: 0; right: 0; top: calc(100% + 39px); display: flex; justify-content: center; }
 .sr-video:focus { outline: none; }
@@ -130,8 +131,3 @@ html:not(.has-cursor) .sr-frame.is-paused .sr-state { opacity: 1; }
 .sr-close:hover span { background: #fff; }
 .sr button:focus-visible, .sr a:focus-visible { outline: 1px solid #fff; outline-offset: 4px; }
 html.is-reel, html.is-reel body { overflow: hidden; }
-@media (max-width: 767px) {
-  .sr-zone { left: 20px; right: 20px; }
-  .sr-frame { width: 100%; }
-  .sr-video { object-fit: contain; }
-}
