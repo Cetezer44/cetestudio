@@ -878,7 +878,7 @@
       '<div class="sr-mark" aria-hidden="true"></div>' +
       '<nav class="sr-nav" aria-label="Menu"></nav>' +
       '<div class="sr-zone"><div class="sr-frame">' +
-        '<video class="sr-video" muted playsinline preload="none" tabindex="0" role="button" aria-label="Pause"></video>' +
+        '<video class="sr-video" muted loop playsinline preload="none" tabindex="0" role="button" aria-label="Pause"></video>' +
         '<div class="sr-state" aria-hidden="true"><svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="1"><circle cx="15" cy="15" r="14.5"/><path d="M12.5 10.2v10.1l8.2-5.05z" stroke-linejoin="round"/></svg></div>' +
         '<div class="sr-bar">' +
           '<button type="button" class="sr-close" aria-label="Fermer le showreel"><span></span><span></span></button>' +
@@ -890,6 +890,7 @@
     var frame = $('.sr-frame', box), video = $('.sr-video', box);
     var texts = [];
     video.muted = true;
+    video.loop = true;   // le showreel tourne en boucle
     var closeBtn = $('.sr-close', box);
     var preview = null;   // extrait en boucle de l'accueil, mis en pause pendant la lecture
 
