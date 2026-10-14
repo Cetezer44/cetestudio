@@ -10,10 +10,16 @@
   c.className = 'c-cursor';
   c.setAttribute('aria-hidden', 'true');
   c.innerHTML = '<div class="c-cursor__ring"></div><div class="c-cursor__dot"></div>' +
-    '<div class="c-cursor__label"><div class="c-cursor__label-in"><img src="' + PLAY + '" alt=""><span>Lire le showreel</span></div></div>';
+    '<div class="c-cursor__label"><div class="c-cursor__label-in"><img src="' + PLAY + '" alt=""><span>Lire le showreel</span></div></div>' +
+    // Lecture / pause au survol de la vidéo du showreel (maquette Figma « Play/Pause »)
+    '<div class="c-cursor__media"><svg class="c-cursor__icon" viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="1">' +
+      '<circle cx="15" cy="15" r="14.5"/>' +
+      '<g class="c-cursor__pause"><path d="M12.5 10v10M17.5 10v10"/></g>' +
+      '<g class="c-cursor__play"><path d="M12.5 10.2v10.1l8.2-5.05z" stroke-linejoin="round"/></g></svg></div>';
   document.body.appendChild(c);
   document.documentElement.classList.add('has-cursor');
   var ring = c.querySelector('.c-cursor__ring'), dot = c.querySelector('.c-cursor__dot'), label = c.querySelector('.c-cursor__label');
+  var media = c.querySelector('.c-cursor__media'), over = null;   // vidéo survolée
   var mx = -100, my = -100, rx = mx, ry = my;
   var LINKS = 'a, button, [role="button"], input[type="submit"], label, select';
 
@@ -25,8 +31,18 @@
   document.addEventListener('mouseover', function (e) {
     var t = e.target.closest ? e.target : null;
     var video = !!(t && t.closest('.showreel'));
+    over = t && t.closest('.sr-video');
     c.classList.toggle('is-video', video);
-    c.classList.toggle('is-hover', !video && !!(t && t.closest(LINKS)));
+    c.classList.toggle('is-hover', !video && !over && !!(t && t.closest(LINKS)));
+    mediaState();
+  });
+  function mediaState() {
+    c.classList.toggle('is-media', !!over);
+    c.classList.toggle('is-paused', !!over && over.paused);
+  }
+  // L'icône suit l'état réel de la vidéo (clic, Espace, fin de lecture…)
+  ['play', 'pause', 'ended'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { if (e.target === over) mediaState(); }, true);
   });
 
   (function loop() {
@@ -35,6 +51,7 @@
     dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
     ring.style.transform = 'translate3d(' + rx + 'px,' + ry + 'px,0)';
     label.style.transform = 'translate3d(' + rx + 'px,' + ry + 'px,0)';
+    media.style.transform = 'translate3d(' + rx + 'px,' + ry + 'px,0)';
     requestAnimationFrame(loop);
   })();
 })();
@@ -842,7 +859,7 @@
 
   /* =====================================================================
      MODAL SHOWREEL : le fond noir monte du bas de l'écran, puis la vidéo apparaît en fondu
-     Contrôles : lecture / pause (bouton, clic sur la vidéo, Espace) et volume (son coupé + curseur)
+     Vidéo muette ; lecture / pause au clic sur la vidéo (icône dans le curseur), Entrée ou Espace
      ===================================================================== */
   var REEL_SRC = 'https://cetestudio.b-cdn.net/Showreel_2024.mp4';
   var Reel = (function () {
@@ -861,20 +878,18 @@
       '<div class="sr-mark" aria-hidden="true"></div>' +
       '<nav class="sr-nav" aria-label="Menu"></nav>' +
       '<div class="sr-zone"><div class="sr-frame">' +
-        '<video class="sr-video" playsinline preload="none"></video>' +
+        '<video class="sr-video" muted playsinline preload="none" tabindex="0" role="button" aria-label="Pause"></video>' +
+        '<div class="sr-state" aria-hidden="true"><svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="1"><circle cx="15" cy="15" r="14.5"/><path d="M12.5 10.2v10.1l8.2-5.05z" stroke-linejoin="round"/></svg></div>' +
         '<div class="sr-bar">' +
-          '<button type="button" class="sr-btn sr-play">Pause</button>' +
           '<button type="button" class="sr-close" aria-label="Fermer le showreel"><span></span><span></span></button>' +
-          '<div class="sr-vol"><button type="button" class="sr-btn sr-mute" aria-pressed="false">Son</button>' +
-            '<input class="sr-range" type="range" min="0" max="1" step="0.05" value="1" aria-label="Volume"></div>' +
         '</div>' +
       '</div></div>';
     document.body.appendChild(box);
 
     var bg = $('.sr-bg', box), mark = $('.sr-mark', box), nav = $('.sr-nav', box);
     var frame = $('.sr-frame', box), video = $('.sr-video', box);
-    var playBtn = $('.sr-play', box), muteBtn = $('.sr-mute', box), range = $('.sr-range', box);
-    var texts = [maskText(playBtn), maskText(muteBtn)];
+    var texts = [];
+    video.muted = true;
     var closeBtn = $('.sr-close', box);
     var preview = null;   // extrait en boucle de l'accueil, mis en pause pendant la lecture
 
@@ -895,12 +910,8 @@
     var links = [];
 
     function sync() {
-      playBtn.firstChild.textContent = video.paused ? 'Lecture' : 'Pause';
-      var muted = video.muted || video.volume === 0;
-      muteBtn.classList.toggle('is-off', muted);
-      muteBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
-      range.value = muted ? 0 : video.volume;
-      range.style.setProperty('--v', (muted ? 0 : video.volume) * 100 + '%');
+      video.setAttribute('aria-label', video.paused ? 'Lecture' : 'Pause');
+      frame.classList.toggle('is-paused', video.paused);
     }
     function toggle() {
       if (video.paused) { var p = video.play(); if (p && p.catch) p.catch(function () {}); }
@@ -908,17 +919,8 @@
     }
     video.addEventListener('play', sync);
     video.addEventListener('pause', sync);
-    video.addEventListener('volumechange', sync);
     video.addEventListener('click', toggle);
-    playBtn.addEventListener('click', toggle);
-    muteBtn.addEventListener('click', function () {
-      if (video.muted || video.volume === 0) { video.muted = false; if (video.volume === 0) video.volume = 1; }
-      else video.muted = true;
-    });
-    range.addEventListener('input', function () {
-      video.volume = +range.value;
-      video.muted = +range.value === 0;
-    });
+    video.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); toggle(); } });
 
     function open() {
       if (isOpen || busy) return;
@@ -928,13 +930,8 @@
       links = fillChrome();
       preview = $('.showreel-video');
       if (preview) preview.pause();
-      if (!video.src) video.src = REEL_SRC;
-      // Lancée pendant le clic (obligatoire sur iOS pour avoir le son), puis remise à zéro au moment du fondu
-      video.muted = false;
-      var p = video.play();
-      if (p && p.then) p.then(function () { if (!shown) video.pause(); }).catch(function () {
-        video.muted = true;    // navigateur qui refuse le son : on lit sans, le bouton « Son » reste disponible
-      });
+      // Chargement lancé dès le clic : la vidéo se met en mémoire pendant que le fond noir monte
+      if (!video.src) { video.preload = 'auto'; video.src = REEL_SRC; }
       links.concat(texts).forEach(hide);
       frame.style.transition = 'none';
       frame.style.opacity = '0';
