@@ -12,10 +12,10 @@
   c.innerHTML = '<div class="c-cursor__ring"></div><div class="c-cursor__dot"></div>' +
     '<div class="c-cursor__label"><div class="c-cursor__label-in"><img src="' + PLAY + '" alt=""><span>Lire le showreel</span></div></div>' +
     // Lecture / pause au survol de la vidéo du showreel (maquette Figma « Play/Pause »)
-    '<div class="c-cursor__media"><svg class="c-cursor__icon" viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="1">' +
-      '<circle cx="15" cy="15" r="14.5"/>' +
-      '<g class="c-cursor__pause"><path d="M12.5 10v10M17.5 10v10"/></g>' +
-      '<g class="c-cursor__play"><path d="M12.5 10.2v10.1l8.2-5.05z" stroke-linejoin="round"/></g></svg></div>';
+    '<div class="c-cursor__media"><svg class="c-cursor__icon" viewBox="0 0 60 60" fill="none" stroke="#fff" stroke-width="1">' +
+      '<circle cx="30" cy="30" r="29.5"/>' +
+      '<g class="c-cursor__pause"><path d="M27.5 25v10M32.5 25v10"/></g>' +
+      '<g class="c-cursor__play"><path d="M27.5 24.9v10.4l8.4-5.2z" stroke-linejoin="round"/></g></svg></div>';
   document.body.appendChild(c);
   document.documentElement.classList.add('has-cursor');
   var ring = c.querySelector('.c-cursor__ring'), dot = c.querySelector('.c-cursor__dot'), label = c.querySelector('.c-cursor__label');
@@ -879,7 +879,7 @@
       '<nav class="sr-nav" aria-label="Menu"></nav>' +
       '<div class="sr-zone"><div class="sr-frame">' +
         '<video class="sr-video" muted loop playsinline preload="none" tabindex="0" role="button" aria-label="Pause"></video>' +
-        '<div class="sr-state" aria-hidden="true"><svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="1"><circle cx="15" cy="15" r="14.5"/><path d="M12.5 10.2v10.1l8.2-5.05z" stroke-linejoin="round"/></svg></div>' +
+        '<div class="sr-state" aria-hidden="true"><svg viewBox="0 0 60 60" fill="none" stroke="#fff" stroke-width="1"><circle cx="30" cy="30" r="29.5"/><path d="M27.5 24.9v10.4l8.4-5.2z" stroke-linejoin="round"/></svg></div>' +
         '<div class="sr-bar">' +
           '<button type="button" class="sr-close" aria-label="Fermer le showreel"><span></span><span></span></button>' +
         '</div>' +
