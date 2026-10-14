@@ -40,6 +40,9 @@ html.is-menu .cm-glass { opacity: 1; visibility: visible; transition: opacity 60
 .cm-mark { position: absolute; left: 30px; top: 31px; width: 14px; opacity: 0; transition: opacity 400ms ease; }
 .cm-mark img { display: block; width: 100%; height: auto; }
 html.is-menu .cm-mark { opacity: 1; transition-delay: 1250ms; }
+/* Logo de la navigation : masqué sous la bande en verre pendant que la modal est ouverte */
+.home-logo { transition: opacity 500ms ease; }
+html.is-menu .home-logo { opacity: 0; transition-duration: 300ms; }
 .cm-bg { position: fixed; top: 0; right: 0; z-index: 49; width: var(--side, 68px); height: 100vh; background: #000; pointer-events: none; }
 html.is-menu .cm-bg { pointer-events: auto; }
 .cm { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 51; visibility: hidden; pointer-events: none; color: #fff; }
