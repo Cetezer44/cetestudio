@@ -400,7 +400,24 @@
     var tags = tagsBox ? $$('.hero-tag', tagsBox) : [];
     var showreel = $('.showreel', track);
     var video = $('.showreel-video', track);
-    if (video && !reduce) { var pv = video.play(); if (pv && pv.catch) pv.catch(function () {}); }
+    // Extrait du showreel en boucle (vidéo native dans le Designer) :
+    // régler data-start (début, en s) et data-length (durée) dans les attributs de l'élément
+    if (video) {
+      video.muted = true;
+      if (reduce) { video.removeAttribute('autoplay'); video.pause(); }
+      else {
+        var vs = +video.getAttribute('data-start') || 0, vl = +video.getAttribute('data-length') || 15;
+        var restart = function () {
+          if (root.classList.contains('is-reel')) return;   // en pause pendant la modal showreel
+          video.currentTime = vs; var p = video.play(); if (p && p.catch) p.catch(function () {});
+        };
+        on(video, 'loadedmetadata', function () { if (video.currentTime < vs) video.currentTime = vs; });
+        on(video, 'timeupdate', function () { if (video.currentTime >= vs + vl) restart(); });
+        on(video, 'pause', function () { if (video.currentTime >= vs + vl - 0.4) restart(); });
+        on(video, 'ended', restart);
+        var pv = video.play(); if (pv && pv.catch) pv.catch(function () {});
+      }
+    }
 
     var api = {
       destroy: function () { alive = false; ac.abort(); clearTimeout(timer); clearTimeout(snapTimer); },
