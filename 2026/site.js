@@ -861,7 +861,7 @@
      MODAL SHOWREEL : le fond noir monte du bas de l'écran, puis la vidéo apparaît en fondu
      Vidéo muette ; lecture / pause au clic sur la vidéo (icône dans le curseur), Entrée ou Espace
      ===================================================================== */
-  var REEL_SRC = 'https://cetestudio.b-cdn.net/Showreel_2024.mp4';
+  var REEL_SRC = 'https://cetestudio.b-cdn.net/Cete/Showreel_2026.mp4';
   var Reel = (function () {
     var isOpen = false, busy = false, lastFocus = null, timers = [], shown = false;
     function later(ms, fn) { timers.push(setTimeout(fn, ms)); }
