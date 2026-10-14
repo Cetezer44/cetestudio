@@ -291,7 +291,7 @@
 
     /* ---- 3. Entrées : molette, tactile, clavier (la page ne défile jamais) ---- */
     var dir = 0;
-    function blocked() { return intro || leaving || root.classList.contains('is-menu'); }
+    function blocked() { return intro || leaving || root.classList.contains('is-menu') || root.classList.contains('is-reel'); }
     function snapLater() {
       clearTimeout(snapTimer);
       snapTimer = setTimeout(function () {
@@ -841,6 +841,189 @@
   })();
 
   /* =====================================================================
+     MODAL SHOWREEL : le fond noir monte du bas de l'écran, puis la vidéo apparaît en fondu
+     Contrôles : lecture / pause (bouton, clic sur la vidéo, Espace) et volume (son coupé + curseur)
+     ===================================================================== */
+  var REEL_SRC = 'https://cetestudio.b-cdn.net/Showreel_2024.mp4';
+  var Reel = (function () {
+    var isOpen = false, busy = false, lastFocus = null, timers = [], shown = false;
+    function later(ms, fn) { timers.push(setTimeout(fn, ms)); }
+    function clearLater() { timers.forEach(clearTimeout); timers = []; }
+
+    var box = document.createElement('div');
+    box.className = 'sr';
+    box.id = 'showreel-modal';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-label', 'Showreel');
+    box.innerHTML =
+      '<div class="sr-bg"></div>' +
+      '<div class="sr-mark" aria-hidden="true"></div>' +
+      '<nav class="sr-nav" aria-label="Menu"></nav>' +
+      '<div class="sr-zone"><div class="sr-frame">' +
+        '<video class="sr-video" playsinline preload="none"></video>' +
+        '<div class="sr-bar">' +
+          '<button type="button" class="sr-btn sr-play">Pause</button>' +
+          '<button type="button" class="sr-close" aria-label="Fermer le showreel"><span></span><span></span></button>' +
+          '<div class="sr-vol"><button type="button" class="sr-btn sr-mute" aria-pressed="false">Son</button>' +
+            '<input class="sr-range" type="range" min="0" max="1" step="0.05" value="1" aria-label="Volume"></div>' +
+        '</div>' +
+      '</div></div>';
+    document.body.appendChild(box);
+
+    var bg = $('.sr-bg', box), mark = $('.sr-mark', box), nav = $('.sr-nav', box);
+    var frame = $('.sr-frame', box), video = $('.sr-video', box);
+    var playBtn = $('.sr-play', box), muteBtn = $('.sr-mute', box), range = $('.sr-range', box);
+    var texts = [maskText(playBtn), maskText(muteBtn)];
+    var closeBtn = $('.sr-close', box);
+    var preview = null;   // extrait en boucle de l'accueil, mis en pause pendant la lecture
+
+    // Logo et navigation repris de la page, en blanc
+    function fillChrome() {
+      var logo = $('.home-logo-img');
+      mark.innerHTML = logo ? '<img src="' + (logo.currentSrc || logo.src) + '" alt="">' : '';
+      nav.innerHTML = '';
+      $$('.home-nav .nav-link').forEach(function (a) {
+        var l = document.createElement('a');
+        l.className = 'sr-link';
+        l.href = a.getAttribute('href') || '#';
+        l.textContent = a.textContent.trim();
+        nav.appendChild(l);
+      });
+      return $$('.sr-link', nav).map(function (l) { return maskText(l); });
+    }
+    var links = [];
+
+    function sync() {
+      playBtn.firstChild.textContent = video.paused ? 'Lecture' : 'Pause';
+      var muted = video.muted || video.volume === 0;
+      muteBtn.classList.toggle('is-off', muted);
+      muteBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+      range.value = muted ? 0 : video.volume;
+      range.style.setProperty('--v', (muted ? 0 : video.volume) * 100 + '%');
+    }
+    function toggle() {
+      if (video.paused) { var p = video.play(); if (p && p.catch) p.catch(function () {}); }
+      else video.pause();
+    }
+    video.addEventListener('play', sync);
+    video.addEventListener('pause', sync);
+    video.addEventListener('volumechange', sync);
+    video.addEventListener('click', toggle);
+    playBtn.addEventListener('click', toggle);
+    muteBtn.addEventListener('click', function () {
+      if (video.muted || video.volume === 0) { video.muted = false; if (video.volume === 0) video.volume = 1; }
+      else video.muted = true;
+    });
+    range.addEventListener('input', function () {
+      video.volume = +range.value;
+      video.muted = +range.value === 0;
+    });
+
+    function open() {
+      if (isOpen || busy) return;
+      isOpen = true; busy = true; shown = false; clearLater();
+      lastFocus = document.activeElement;
+      root.classList.add('is-reel');
+      links = fillChrome();
+      preview = $('.showreel-video');
+      if (preview) preview.pause();
+      if (!video.src) video.src = REEL_SRC;
+      // Lancée pendant le clic (obligatoire sur iOS pour avoir le son), puis remise à zéro au moment du fondu
+      video.muted = false;
+      var p = video.play();
+      if (p && p.then) p.then(function () { if (!shown) video.pause(); }).catch(function () {
+        video.muted = true;    // navigateur qui refuse le son : on lit sans, le bouton « Son » reste disponible
+      });
+      links.concat(texts).forEach(hide);
+      frame.style.transition = 'none';
+      frame.style.opacity = '0';
+      mark.style.transition = 'none';
+      mark.style.opacity = '0';
+      closeBtn.classList.remove('is-in');
+      bg.style.transition = 'none';
+      bg.style.clipPath = 'inset(100% 0 0 0)';
+      box.style.visibility = 'visible';
+      box.offsetHeight;
+      sync();
+      if (reduce) {
+        bg.style.clipPath = 'inset(0)'; frame.style.opacity = '1'; mark.style.opacity = '1';
+        links.concat(texts).forEach(function (el) { el.style.transform = 'none'; });
+        closeBtn.classList.add('is-in');
+        shown = true; video.currentTime = 0; toggle(); sync();
+        busy = false; closeBtn.focus({ preventScroll: true });
+        return;
+      }
+      // 1. Le fond noir monte depuis le bas
+      bg.style.transition = 'clip-path 1000ms ' + INOUT;
+      bg.style.clipPath = 'inset(0 0 0 0)';
+      // 2. Une fois le fond en place : la vidéo apparaît en fondu et démarre
+      later(1000, function () {
+        shown = true;
+        try { video.currentTime = 0; } catch (e) {}
+        if (video.paused) toggle();
+        frame.style.transition = 'opacity 900ms ease';
+        frame.style.opacity = '1';
+        mark.style.transition = 'opacity 600ms ease';
+        mark.style.opacity = '1';
+      });
+      // 3. Navigation et contrôles en masque
+      reveal(links, 1100, 60, 900);
+      reveal(texts, 1300, 80, 900);
+      later(1300, function () { closeBtn.classList.add('is-in'); });
+      later(1300, function () { busy = false; closeBtn.focus({ preventScroll: true }); });
+    }
+
+    function shut(fast) {
+      if (!isOpen) return Promise.resolve();
+      isOpen = false; busy = true; clearLater();
+      var out = reduce || fast ? 0 : 450;
+      if (out) {
+        conceal(links.concat(texts), 0, 20, 450);
+        closeBtn.classList.remove('is-in');
+        frame.style.transition = 'opacity 450ms ease';
+        frame.style.opacity = '0';
+        mark.style.transition = 'opacity 400ms ease';
+        mark.style.opacity = '0';
+      }
+      return new Promise(function (res) {
+        later(out, function () {
+          video.pause();
+          // Le fond noir repart vers le haut et découvre la page
+          bg.style.transition = out ? 'clip-path 900ms ' + INOUT : 'none';
+          bg.style.clipPath = 'inset(0 0 100% 0)';
+          later(out ? 950 : 0, function () {
+            box.style.visibility = 'hidden';
+            root.classList.remove('is-reel');
+            if (preview && document.contains(preview) && !reduce) { var p = preview.play(); if (p && p.catch) p.catch(function () {}); }
+            busy = false;
+            if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
+            res();
+          });
+        });
+      });
+    }
+
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('.showreel, .sr-close');
+      if (!t) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (t.classList.contains('sr-close')) shut(); else open();
+    }, true);
+    document.addEventListener('keydown', function (e) {
+      if (!isOpen) return;
+      if (e.key === 'Escape') { e.preventDefault(); shut(); }
+      else if (e.key === ' ' && e.target === document.body || (e.key === ' ' && e.target === video)) { e.preventDefault(); toggle(); }
+    });
+    // Molette et gestes ne font pas tourner la roulette derrière la modal
+    ['wheel', 'touchmove'].forEach(function (ev) {
+      box.addEventListener(ev, function (e) { e.stopPropagation(); }, { passive: true });
+    });
+    return { open: open, close: shut, isOpen: function () { return isOpen; } };
+  })();
+
+  /* =====================================================================
      NAVIGATION : Barba.js
      ===================================================================== */
   var page = null, prev = null;
@@ -887,7 +1070,10 @@
   }
 
   var leaveData = null;
-  barba.hooks.before(function () { if (Menu.isOpen()) return Menu.close(true); });   // un lien du menu ferme la modal
+  barba.hooks.before(function () {   // un lien d'une modal la ferme avant la transition
+    if (Reel.isOpen()) return Reel.close(true);
+    if (Menu.isOpen()) return Menu.close(true);
+  });   // un lien du menu ferme la modal
   barba.hooks.beforeLeave(function () { prev = page; });
   barba.hooks.afterLeave(function () { if (prev && prev.destroy) prev.destroy(); });
   barba.hooks.after(function (data) {
